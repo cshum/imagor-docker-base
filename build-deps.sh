@@ -292,6 +292,21 @@ meson_install librsvg \
   -Davif=enabled
 
 cd "$deps_dir/vips"
+magick_args=()
+if [ "${ENABLE_MAGICK:-false}" = "true" ]; then
+  magick_pkg="$(pkg-config --list-all | awk '/^MagickCore/ { print $1; exit } /^ImageMagick/ { print $1; exit }')"
+  if [ -z "$magick_pkg" ]; then
+    echo "unable to locate an ImageMagick pkg-config package" >&2
+    exit 1
+  fi
+  magick_args=(
+    -Dmagick=enabled
+    "-Dmagick-package=$magick_pkg"
+  )
+else
+  magick_args=(-Dmagick=disabled)
+fi
+
 meson setup _build \
   --buildtype=release \
   --strip \
@@ -301,7 +316,7 @@ meson setup _build \
   -Ddocs=false \
   -Dintrospection=disabled \
   -Dmodules=disabled \
-  -Dmagick=$(if [ "${ENABLE_MAGICK:-false}" = "true" ]; then echo enabled; else echo disabled; fi)
+  "${magick_args[@]}"
 ninja -C _build
 ninja -C _build install
 
