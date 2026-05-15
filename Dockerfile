@@ -10,6 +10,7 @@ COPY . /tmp/imagor-docker-base
 RUN apt-get update \
   && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     autoconf \
+    autopoint \
     automake \
     bash \
     bison \
