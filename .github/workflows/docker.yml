@@ -53,7 +53,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ghcr.io/cshum/imagor-base
           tags: |
             type=raw,value=${{ steps.versions.outputs.image_tag }}
             type=raw,value=latest-${{ matrix.variant.name }},enable=${{ github.ref == 'refs/heads/main' && matrix.variant.name != 'default' }}

@@ -5,7 +5,7 @@ FROM ${BASE_IMAGE} AS builder
 ARG ENABLE_MAGICK=false
 ARG ENABLE_MOZJPEG=false
 
-COPY . /tmp/imagor-docker-base
+COPY . /tmp/imagor-base
 
 RUN apt-get update \
   && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -32,11 +32,11 @@ RUN apt-get update \
   && if [ "$ENABLE_MAGICK" = "true" ]; then \
     apt-get install -y --no-install-recommends libmagickwand-dev; \
   fi \
-  && /tmp/imagor-docker-base/install-rust.sh \
+  && /tmp/imagor-base/install-rust.sh \
   && python3 -m venv /root/.python \
   && /root/.python/bin/pip install --no-cache-dir meson ninja packaging 'cmake<4' \
-  && /tmp/imagor-docker-base/build-env.sh > /etc/profile.d/imagor-base.sh \
-  && chmod +x /tmp/imagor-docker-base/*.sh \
+  && /tmp/imagor-base/build-env.sh > /etc/profile.d/imagor-base.sh \
+  && chmod +x /tmp/imagor-base/*.sh \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
@@ -44,9 +44,9 @@ ENV BASH_ENV=/etc/profile.d/imagor-base.sh
 ENV ENABLE_MAGICK=${ENABLE_MAGICK}
 ENV ENABLE_MOZJPEG=${ENABLE_MOZJPEG}
 
-RUN /tmp/imagor-docker-base/download-deps.sh \
-  && /tmp/imagor-docker-base/build-deps.sh \
-  && rm -rf /root/deps /tmp/imagor-docker-base
+RUN /tmp/imagor-base/download-deps.sh \
+  && /tmp/imagor-base/build-deps.sh \
+  && rm -rf /root/deps /tmp/imagor-base
 
 FROM ${BASE_IMAGE} AS final
 
