@@ -20,6 +20,8 @@ RUN apt-get update \
     gettext \
     git \
     gperf \
+    libcurl4-openssl-dev \
+    libssl-dev \
     libtool \
     nasm \
     pkg-config \
