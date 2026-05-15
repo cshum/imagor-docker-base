@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=public.ecr.aws/ubuntu/ubuntu:22.04
+ARG BASE_IMAGE=ubuntu:22.04
 
 FROM ${BASE_IMAGE} AS builder
 
@@ -26,6 +26,9 @@ RUN apt-get update \
     python3-pip \
     python3-venv \
     xz-utils \
+  && if [ "$ENABLE_MAGICK" = "true" ]; then \
+    apt-get install -y --no-install-recommends libmagickwand-dev; \
+  fi \
   && /tmp/imagor-docker-base/install-rust.sh \
   && python3 -m venv /root/.python \
   && /root/.python/bin/pip install --no-cache-dir meson ninja packaging cmake \
@@ -53,6 +56,9 @@ RUN apt-get update \
     libgcc-s1 \
     libjemalloc2 \
     libstdc++6 \
+  && if [ "$ENABLE_MAGICK" = "true" ]; then \
+    apt-get install -y --no-install-recommends libmagickwand-6.q16-6; \
+  fi \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 

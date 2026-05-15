@@ -300,6 +300,6 @@ ninja -C _build
 ninja -C _build install
 
 rm -f "$prefix"/lib/libvips-cpp.*
-rm -rf "$prefix"/lib/pkgconfig "$prefix"/lib/cmake
+rm -rf "$prefix"/lib/cmake
 find "$prefix"/lib -name '*.a' -delete
 find "$prefix"/lib -name '*.la' -delete
