@@ -123,6 +123,7 @@ if [ "${ENABLE_MOZJPEG:-false}" = "true" ]; then
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="$prefix" \
     -DENABLE_SHARED=TRUE \
+    -DPNG_SUPPORTED=FALSE \
     -DWITH_JPEG8=TRUE \
     ..
   ninja install/strip
