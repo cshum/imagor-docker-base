@@ -8,11 +8,13 @@ This repository owns the native dependency build for libvips and related codecs.
 
 The GitHub Actions workflow publishes these variants:
 
-- `ghcr.io/cshum/imagor-docker-base:vips-<version>`
-- `ghcr.io/cshum/imagor-docker-base:vips-<version>-magick`
-- `ghcr.io/cshum/imagor-docker-base:vips-<version>-mozjpeg`
+- `ghcr.io/cshum/imagor-docker-base:ubuntu22.04-vips<vips>`
+- `ghcr.io/cshum/imagor-docker-base:ubuntu22.04-vips<vips>-magick`
+- `ghcr.io/cshum/imagor-docker-base:ubuntu22.04-vips<vips>-mozjpeg`
 
 `latest`, `latest-magick`, and `latest-mozjpeg` are also published from the `master` branch.
+
+This keeps the public tag focused on the compatibility boundary that matters most: distro baseline, libvips version, and feature variant. More detailed dependency versions can live in labels or release notes.
 
 ## Local build
 

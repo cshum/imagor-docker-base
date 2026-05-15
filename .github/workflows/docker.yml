@@ -18,13 +18,10 @@ jobs:
       matrix:
         variant:
           - name: default
-            suffix: ""
             build_args: ""
           - name: magick
-            suffix: -magick
             build_args: ENABLE_MAGICK=true
           - name: mozjpeg
-            suffix: -mozjpeg
             build_args: ENABLE_MOZJPEG=true
 
     steps:
@@ -46,11 +43,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Read libvips version
+      - name: Read image tag
         id: versions
         run: |
-          source versions.sh
-          echo "vips_version=${VIPS_VERSION}" >> "$GITHUB_OUTPUT"
+          chmod +x image-tag.sh
+          echo "image_tag=$(./image-tag.sh ${{ matrix.variant.name }})" >> "$GITHUB_OUTPUT"
 
       - name: Extract Docker metadata
         id: meta
@@ -58,8 +55,9 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=raw,value=vips-${{ steps.versions.outputs.vips_version }}${{ matrix.variant.suffix }}
-            type=raw,value=latest${{ matrix.variant.suffix }},enable=${{ github.ref == 'refs/heads/master' }}
+            type=raw,value=${{ steps.versions.outputs.image_tag }}
+            type=raw,value=latest-${{ matrix.variant.name }},enable=${{ github.ref == 'refs/heads/master' && matrix.variant.name != 'default' }}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' && matrix.variant.name == 'default' }}
 
       - name: Build and push imagor base
         uses: docker/build-push-action@v6
