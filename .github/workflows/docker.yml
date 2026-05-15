@@ -56,8 +56,8 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             type=raw,value=${{ steps.versions.outputs.image_tag }}
-            type=raw,value=latest-${{ matrix.variant.name }},enable=${{ github.ref == 'refs/heads/master' && matrix.variant.name != 'default' }}
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' && matrix.variant.name == 'default' }}
+            type=raw,value=latest-${{ matrix.variant.name }},enable=${{ github.ref == 'refs/heads/main' && matrix.variant.name != 'default' }}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.variant.name == 'default' }}
 
       - name: Build and push imagor base
         uses: docker/build-push-action@v6
