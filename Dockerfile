@@ -32,7 +32,7 @@ RUN apt-get update \
   fi \
   && /tmp/imagor-docker-base/install-rust.sh \
   && python3 -m venv /root/.python \
-  && /root/.python/bin/pip install --no-cache-dir meson ninja packaging cmake \
+  && /root/.python/bin/pip install --no-cache-dir meson ninja packaging 'cmake<4' \
   && /tmp/imagor-docker-base/build-env.sh > /etc/profile.d/imagor-base.sh \
   && chmod +x /tmp/imagor-docker-base/*.sh \
   && apt-get clean \
