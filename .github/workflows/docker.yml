@@ -201,6 +201,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           build-args: |
-            SOURCE_IMAGE=ghcr.io/cshum/imagor-base:${{ steps.versions.outputs.source_tag }}
+            SOURCE_TAG=${{ steps.versions.outputs.source_tag }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

@@ -1,6 +1,7 @@
-ARG SOURCE_IMAGE=ghcr.io/cshum/imagor-base:vips8.18.2-r1
+ARG SOURCE_REPOSITORY=ghcr.io/cshum/imagor-base
+ARG SOURCE_TAG=latest
 
-FROM ${SOURCE_IMAGE} AS builder
+FROM ${SOURCE_REPOSITORY}:${SOURCE_TAG} AS builder
 
 COPY . /tmp/imagor-base
 
@@ -29,7 +30,7 @@ RUN apt-get update \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/imagor-base
 
-FROM ${SOURCE_IMAGE} AS final
+FROM ${SOURCE_REPOSITORY}:${SOURCE_TAG} AS final
 
 COPY --from=builder /opt/imagor /opt/imagor
 
