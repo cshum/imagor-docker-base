@@ -105,8 +105,10 @@ configure_make_install libexif \
   --disable-static \
   --disable-dependency-tracking
 
-cd "$deps_dir/lcms2"
-./configure \
+configure_make_install lcms2 \
+  --enable-shared \
+  --disable-static \
+  --disable-dependency-tracking
 
 system_pkg_config_path="$(env -u PKG_CONFIG_LIBDIR -u PKG_CONFIG_PATH pkg-config --variable pc_path pkg-config)"
 extended_pkg_config_libdir="$PKG_CONFIG_LIBDIR:$system_pkg_config_path"
@@ -120,12 +122,6 @@ env PKG_CONFIG_LIBDIR="$extended_pkg_config_libdir" PKG_CONFIG_PATH="$extended_p
     --disable-static \
     --disable-examples \
     --disable-dependency-tracking
-make -j"$(nproc)"
-make install-strip
-  --prefix="$prefix" \
-  --enable-shared \
-  --disable-static \
-  --disable-dependency-tracking
 make -j"$(nproc)"
 make install-strip
 
