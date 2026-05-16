@@ -1,0 +1,43 @@
+ARG SOURCE_IMAGE=ghcr.io/cshum/imagor-base:vips8.18.2
+
+FROM ${SOURCE_IMAGE} AS builder
+
+COPY . /tmp/imagor-base
+
+RUN apt-get update \
+  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    bash \
+    build-essential \
+    ca-certificates \
+    curl \
+    nasm \
+    pkg-config \
+    yasm \
+    libaom-dev \
+    libdav1d-dev \
+    librtmp-dev \
+    libtheora-dev \
+    libvorbis-dev \
+    libvpx-dev \
+    libwebp-dev \
+    libx264-dev \
+    libx265-dev \
+    libnuma-dev \
+    xz-utils \
+  && chmod +x /tmp/imagor-base/*.sh \
+  && /tmp/imagor-base/build-ffmpeg.sh \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* /tmp/imagor-base
+
+FROM ${SOURCE_IMAGE} AS final
+
+COPY --from=builder /opt/imagor /opt/imagor
+
+ENV PKG_CONFIG_PATH=/opt/imagor/lib/pkgconfig
+ENV CGO_CFLAGS=-I/opt/imagor/include
+ENV CGO_LDFLAGS="-L/opt/imagor/lib -Wl,-rpath,/opt/imagor/lib"
+ENV LD_LIBRARY_PATH=/opt/imagor/lib
+ENV FONTCONFIG_PATH=/etc/fonts
+
+WORKDIR /src
+CMD ["bash"]

@@ -17,6 +17,12 @@ case "${1:-default}" in
   mozjpeg)
     echo "${base_tag}-mozjpeg"
     ;;
+  ffmpeg)
+    echo "${base_tag}-ffmpeg"
+    ;;
+  magick-ffmpeg)
+    echo "${base_tag}-magick-ffmpeg"
+    ;;
   *)
     echo "unknown variant: ${1}" >&2
     exit 1
