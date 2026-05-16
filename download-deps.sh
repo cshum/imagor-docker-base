@@ -63,6 +63,7 @@ fetch_tar cairo "https://gitlab.freedesktop.org/cairo/cairo/-/archive/${CAIRO_VE
 fetch_tar fribidi "https://github.com/fribidi/fribidi/releases/download/v${FRIBIDI_VERSION}/fribidi-${FRIBIDI_VERSION}.tar.xz" -xJ
 fetch_tar pango "https://download.gnome.org/sources/pango/$(minor_version "$PANGO_VERSION")/pango-${PANGO_VERSION}.tar.xz" -xJ
 fetch_tar librsvg "https://download.gnome.org/sources/librsvg/$(minor_version "$LIBRSVG_VERSION")/librsvg-${LIBRSVG_VERSION}.tar.xz" -xJ
+fetch_tar libraw "https://www.libraw.org/data/LibRaw-${LIBRAW_VERSION}.tar.gz" -xz
 fetch_tar vips "https://github.com/libvips/libvips/releases/download/v${VIPS_VERSION}/vips-${VIPS_VERSION}.tar.xz" -xJ
 
 if [ ! -f "$deps_dir/pcre2/configure" ]; then

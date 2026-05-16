@@ -107,6 +107,21 @@ configure_make_install libexif \
 
 cd "$deps_dir/lcms2"
 ./configure \
+
+system_pkg_config_path="$(env -u PKG_CONFIG_LIBDIR -u PKG_CONFIG_PATH pkg-config --variable pc_path pkg-config)"
+extended_pkg_config_libdir="$PKG_CONFIG_LIBDIR:$system_pkg_config_path"
+extended_pkg_config_path="$PKG_CONFIG_PATH:$system_pkg_config_path"
+
+cd "$deps_dir/libraw"
+env PKG_CONFIG_LIBDIR="$extended_pkg_config_libdir" PKG_CONFIG_PATH="$extended_pkg_config_path" \
+  ./configure \
+    --prefix="$prefix" \
+    --enable-shared \
+    --disable-static \
+    --disable-examples \
+    --disable-dependency-tracking
+make -j"$(nproc)"
+make install-strip
   --prefix="$prefix" \
   --enable-shared \
   --disable-static \
@@ -293,7 +308,6 @@ meson_install librsvg \
 
 cd "$deps_dir/vips"
 magick_args=()
-system_pkg_config_path="$(env -u PKG_CONFIG_LIBDIR -u PKG_CONFIG_PATH pkg-config --variable pc_path pkg-config)"
 vips_pkg_config_libdir="$PKG_CONFIG_LIBDIR:$system_pkg_config_path"
 vips_pkg_config_path="$PKG_CONFIG_PATH:$system_pkg_config_path"
 if [ "${ENABLE_MAGICK:-false}" = "true" ]; then

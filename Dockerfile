@@ -20,10 +20,15 @@ RUN apt-get update \
     gettext \
     git \
     gperf \
+    libcfitsio-dev \
+    libfftw3-dev \
+    libgsf-1-dev \
     libimagequant-dev \
+    libmatio-dev \
     libopenjp2-7-dev \
+    libopenslide-dev \
+    liborc-0.4-dev \
     libpoppler-glib-dev \
-    libraw-dev \
     libcurl4-openssl-dev \
     libssl-dev \
     libtool \
@@ -60,12 +65,17 @@ RUN apt-get update \
     ca-certificates \
     fontconfig-config \
     fonts-dejavu-core \
+    libcfitsio10t64 \
+    libfftw3-double3 \
     libgcc-s1 \
+    libgsf-1-114 \
     libimagequant0 \
     libjemalloc2 \
+    libmatio11 \
     libopenjp2-7 \
+    libopenslide0 \
+    liborc-0.4-0t64 \
     libpoppler-glib8t64 \
-    libraw23t64 \
     libstdc++6 \
   && if [ "$ENABLE_MAGICK" = "true" ]; then \
     apt-get install -y --no-install-recommends libmagickwand-6.q16-7t64; \
