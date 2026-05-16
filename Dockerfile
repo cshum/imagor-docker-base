@@ -64,11 +64,11 @@ RUN apt-get update \
     libimagequant0 \
     libjemalloc2 \
     libopenjp2-7 \
-    libpoppler-glib8 \
-    libraw20 \
+    libpoppler-glib8t64 \
+    libraw23t64 \
     libstdc++6 \
   && if [ "$ENABLE_MAGICK" = "true" ]; then \
-    apt-get install -y --no-install-recommends libmagickwand-6.q16-6; \
+    apt-get install -y --no-install-recommends libmagickwand-6.q16-7t64; \
   fi \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
