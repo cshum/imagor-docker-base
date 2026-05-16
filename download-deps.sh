@@ -20,9 +20,24 @@ fetch_tar() {
   local name="$1"
   local url="$2"
   local strip_flag="$3"
+  local archive
 
   mkdir -p "$deps_dir/$name"
-  curl -LfsS "$url" | tar "$strip_flag" -C "$deps_dir/$name" --strip-components=1
+  archive="$(mktemp "/tmp/${name}.XXXXXX")"
+
+  rm -rf "$deps_dir/$name"
+  mkdir -p "$deps_dir/$name"
+
+  curl \
+    -LfsS \
+    --retry 5 \
+    --retry-all-errors \
+    --retry-delay 2 \
+    -o "$archive" \
+    "$url"
+
+  tar "$strip_flag" -f "$archive" -C "$deps_dir/$name" --strip-components=1
+  rm -f "$archive"
 }
 
 fetch_git() {
