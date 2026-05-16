@@ -47,7 +47,7 @@ jobs:
           chmod +x image-tag.sh
           echo "image_tag=$(./image-tag.sh ${{ matrix.variant.name }})" >> "$GITHUB_OUTPUT"
 
-      - name: Check whether image tag already exists
+      - name: Check whether image tag is already complete
         id: image
         env:
           IMAGE_REF: ghcr.io/cshum/imagor-base:${{ steps.versions.outputs.image_tag }}
@@ -56,12 +56,19 @@ jobs:
           if [ "$FORCE_BUILD" = "true" ]; then
             echo "exists=false" >> "$GITHUB_OUTPUT"
             echo "reason=forced rebuild" >> "$GITHUB_OUTPUT"
-          elif docker manifest inspect "$IMAGE_REF" >/dev/null 2>&1; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-            echo "reason=tag already exists" >> "$GITHUB_OUTPUT"
           else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-            echo "reason=tag missing" >> "$GITHUB_OUTPUT"
+            inspect_output="$(docker manifest inspect "$IMAGE_REF" 2>/dev/null || true)"
+            if [ -z "$inspect_output" ]; then
+              echo "exists=false" >> "$GITHUB_OUTPUT"
+              echo "reason=tag missing" >> "$GITHUB_OUTPUT"
+            elif python3 -c 'import json, sys; data=json.load(sys.stdin); required={("linux", "amd64"), ("linux", "arm64")}; actual={(m.get("platform", {}).get("os"), m.get("platform", {}).get("architecture")) for m in data.get("manifests", [])} or {(data.get("os"), data.get("architecture"))}; raise SystemExit(0 if required.issubset(actual) else 1)' <<<"$inspect_output"
+            then
+              echo "exists=true" >> "$GITHUB_OUTPUT"
+              echo "reason=complete multi-arch manifest already exists" >> "$GITHUB_OUTPUT"
+            else
+              echo "exists=false" >> "$GITHUB_OUTPUT"
+              echo "reason=manifest exists but is incomplete" >> "$GITHUB_OUTPUT"
+            fi
           fi
 
       - name: Skip existing image tag

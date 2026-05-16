@@ -16,7 +16,7 @@ The GitHub Actions workflow publishes these variants:
 
 This keeps the public tag focused on the compatibility boundary that matters most: libvips version and feature variant. The distro baseline can live in labels, release notes, or the Dockerfile history.
 
-If the computed version tag already exists in GHCR, the workflow skips rebuilding it by default. Use the `force_build` workflow-dispatch input when you want to rebuild anyway.
+If the computed version tag already exists in GHCR with a complete `linux/amd64` and `linux/arm64` manifest, the workflow skips rebuilding it by default. If the tag is missing or only partially published, the workflow builds again. Use the `force_build` workflow-dispatch input when you want to rebuild anyway.
 
 ## Local build
 
