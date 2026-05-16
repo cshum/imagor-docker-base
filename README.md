@@ -8,13 +8,15 @@ This repository owns the native dependency build for libvips and related codecs.
 
 The GitHub Actions workflow publishes these variants:
 
-- `ghcr.io/cshum/imagor-base:ubuntu22.04-vips<vips>`
-- `ghcr.io/cshum/imagor-base:ubuntu22.04-vips<vips>-magick`
-- `ghcr.io/cshum/imagor-base:ubuntu22.04-vips<vips>-mozjpeg`
+- `ghcr.io/cshum/imagor-base:vips<vips>`
+- `ghcr.io/cshum/imagor-base:vips<vips>-magick`
+- `ghcr.io/cshum/imagor-base:vips<vips>-mozjpeg`
 
 `latest`, `latest-magick`, and `latest-mozjpeg` are also published from the `main` branch.
 
-This keeps the public tag focused on the compatibility boundary that matters most: distro baseline, libvips version, and feature variant. More detailed dependency versions can live in labels or release notes.
+This keeps the public tag focused on the compatibility boundary that matters most: libvips version and feature variant. The distro baseline can live in labels, release notes, or the Dockerfile history.
+
+If the computed version tag already exists in GHCR, the workflow skips rebuilding it by default. Use the `force_build` workflow-dispatch input when you want to rebuild anyway.
 
 ## Local build
 
