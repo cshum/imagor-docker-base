@@ -5,7 +5,7 @@ set -euo pipefail
 script_dir="$(cd "$(dirname "$0")" && pwd)"
 source "$script_dir/versions.sh"
 
-base_tag="vips${VIPS_VERSION}"
+base_tag="vips${VIPS_VERSION}-r${IMAGOR_BASE_REVISION}"
 
 case "${1:-default}" in
   default)

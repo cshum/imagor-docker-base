@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=ubuntu:22.04
+ARG BASE_IMAGE=ubuntu:noble
 
 FROM ${BASE_IMAGE} AS builder
 
@@ -20,6 +20,10 @@ RUN apt-get update \
     gettext \
     git \
     gperf \
+    libimagequant-dev \
+    libopenjp2-7-dev \
+    libpoppler-glib-dev \
+    libraw-dev \
     libcurl4-openssl-dev \
     libssl-dev \
     libtool \
@@ -57,7 +61,11 @@ RUN apt-get update \
     fontconfig-config \
     fonts-dejavu-core \
     libgcc-s1 \
+    libimagequant0 \
     libjemalloc2 \
+    libopenjp2-7 \
+    libpoppler-glib8 \
+    libraw20 \
     libstdc++6 \
   && if [ "$ENABLE_MAGICK" = "true" ]; then \
     apt-get install -y --no-install-recommends libmagickwand-6.q16-6; \

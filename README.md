@@ -8,15 +8,19 @@ This repository owns the native dependency build for libvips and related codecs.
 
 The GitHub Actions workflow publishes these variants:
 
-- `ghcr.io/cshum/imagor-base:vips<vips>`
-- `ghcr.io/cshum/imagor-base:vips<vips>-magick`
-- `ghcr.io/cshum/imagor-base:vips<vips>-mozjpeg`
-- `ghcr.io/cshum/imagor-base:vips<vips>-ffmpeg`
-- `ghcr.io/cshum/imagor-base:vips<vips>-magick-ffmpeg`
+- `ghcr.io/cshum/imagor-base:vips<vips>-r<rev>`
+- `ghcr.io/cshum/imagor-base:vips<vips>-r<rev>-magick`
+- `ghcr.io/cshum/imagor-base:vips<vips>-r<rev>-mozjpeg`
+- `ghcr.io/cshum/imagor-base:vips<vips>-r<rev>-ffmpeg`
+- `ghcr.io/cshum/imagor-base:vips<vips>-r<rev>-magick-ffmpeg`
 
 `latest`, `latest-magick`, and `latest-mozjpeg` are also published from the `main` branch.
 
 This keeps the public tag focused on the compatibility boundary that matters most: libvips version and feature variant. The distro baseline can live in labels, release notes, or the Dockerfile history.
+
+The default build baseline is `ubuntu:noble`, though callers can still override `BASE_IMAGE` at build time.
+
+`r<rev>` is the base-image revision line for cases where the native capability surface changes while the upstream libvips version stays the same.
 
 `default`, `magick`, and `mozjpeg` are built as independent native-stack variants. `ffmpeg` is layered on top of `default`, and `magick-ffmpeg` is layered on top of `magick`.
 

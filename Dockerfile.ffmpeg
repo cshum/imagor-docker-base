@@ -1,4 +1,4 @@
-ARG SOURCE_IMAGE=ghcr.io/cshum/imagor-base:vips8.18.2
+ARG SOURCE_IMAGE=ghcr.io/cshum/imagor-base:vips8.18.2-r1
 
 FROM ${SOURCE_IMAGE} AS builder
 

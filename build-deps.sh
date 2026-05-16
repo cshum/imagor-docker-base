@@ -293,12 +293,10 @@ meson_install librsvg \
 
 cd "$deps_dir/vips"
 magick_args=()
-vips_pkg_config_libdir="$PKG_CONFIG_LIBDIR"
-vips_pkg_config_path="$PKG_CONFIG_PATH"
+system_pkg_config_path="$(env -u PKG_CONFIG_LIBDIR -u PKG_CONFIG_PATH pkg-config --variable pc_path pkg-config)"
+vips_pkg_config_libdir="$PKG_CONFIG_LIBDIR:$system_pkg_config_path"
+vips_pkg_config_path="$PKG_CONFIG_PATH:$system_pkg_config_path"
 if [ "${ENABLE_MAGICK:-false}" = "true" ]; then
-  system_pkg_config_path="$(env -u PKG_CONFIG_LIBDIR -u PKG_CONFIG_PATH pkg-config --variable pc_path pkg-config)"
-  vips_pkg_config_libdir="$PKG_CONFIG_LIBDIR:$system_pkg_config_path"
-  vips_pkg_config_path="$PKG_CONFIG_PATH:$system_pkg_config_path"
   magick_pkg="$(env PKG_CONFIG_LIBDIR="$vips_pkg_config_libdir" PKG_CONFIG_PATH="$vips_pkg_config_path" pkg-config --list-all | awk '/^MagickCore/ { print $1; exit } /^ImageMagick/ { print $1; exit }')"
   if [ -z "$magick_pkg" ]; then
     echo "unable to locate an ImageMagick pkg-config package" >&2
