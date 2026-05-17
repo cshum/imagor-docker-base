@@ -1,0 +1,133 @@
+From 5d56b234d465358f0fcdfbac93835f1094dc13ae Mon Sep 17 00:00:00 2001
+From: DarthSim <darthsim@gmail.com>
+Date: Tue, 17 Mar 2026 01:58:59 +0300
+Subject: [PATCH] AOM/Kvazaar/Rav1e/SVT/uvg266/vvenc: fix memory leak when
+ encoder is reused for alpha encoding
+
+---
+ libheif/plugins/encoder_aom.cc     |  4 ++++
+ libheif/plugins/encoder_kvazaar.cc | 13 +++++++++++++
+ libheif/plugins/encoder_rav1e.cc   |  7 +++++++
+ libheif/plugins/encoder_svt.cc     |  8 ++++++++
+ libheif/plugins/encoder_uvg266.cc  | 13 +++++++++++++
+ libheif/plugins/encoder_vvenc.cc   |  7 +++++++
+ 6 files changed, 52 insertions(+)
+
+diff --git a/libheif/plugins/encoder_aom.cc b/libheif/plugins/encoder_aom.cc
+index 6e58a8aa0d..a9dd4802b0 100644
+--- a/libheif/plugins/encoder_aom.cc
++++ b/libheif/plugins/encoder_aom.cc
+@@ -865,6 +865,10 @@ static heif_error aom_start_sequence_encoding_intern(void* encoder_raw, const he
+ {
+   encoder_struct_aom* encoder = (encoder_struct_aom*) encoder_raw;
+ 
++  // destroy the codec in case it was already initialized
++  // (e.g. when the encoder is reused for alpha encoding after being used for YUV encoding)
++  aom_codec_destroy(&encoder->codec);
++
+   heif_error err;
+ 
+   const int source_width = heif_image_get_width(image, heif_channel_Y);
+diff --git a/libheif/plugins/encoder_kvazaar.cc b/libheif/plugins/encoder_kvazaar.cc
+index 318e60291c..ba7ee4f5f6 100644
+--- a/libheif/plugins/encoder_kvazaar.cc
++++ b/libheif/plugins/encoder_kvazaar.cc
+@@ -463,6 +463,19 @@ static heif_error kvazaar_start_sequence_encoding_intern(void* encoder_raw, cons
+ {
+   encoder_struct_kvazaar* encoder = (encoder_struct_kvazaar*) encoder_raw;
+ 
++  // close the encoder if it was already initialized
++  // (e.g. when the encoder is reused for alpha encoding after being used for YUV encoding)
++  if (encoder->api) {
++    if (encoder->kvzencoder) {
++      encoder->api->encoder_close(encoder->kvzencoder);
++      encoder->kvzencoder = nullptr;
++    }
++    if (encoder->config) {
++      encoder->api->config_destroy(encoder->config);
++      encoder->config = nullptr;
++    }
++  }
++
+   int bit_depth = heif_image_get_bits_per_pixel_range(image, heif_channel_Y);
+ 
+   // Kvazaar uses a hard-coded bit depth (https://github.com/ultravideo/kvazaar/issues/399).
+diff --git a/libheif/plugins/encoder_rav1e.cc b/libheif/plugins/encoder_rav1e.cc
+index 641618b75b..c2850dfda3 100644
+--- a/libheif/plugins/encoder_rav1e.cc
++++ b/libheif/plugins/encoder_rav1e.cc
+@@ -509,6 +509,13 @@ heif_error rav1e_start_sequence_encoding_intern(void* encoder_raw, const heif_im
+ {
+   auto* encoder = (encoder_struct_rav1e*) encoder_raw;
+ 
++  // unref the context if it was already initialized
++  // (e.g. when the encoder is reused for alpha encoding after being used for YUV encoding)
++  if (encoder->rav1eContextRaw) {
++    rav1e_context_unref(encoder->rav1eContextRaw);
++    encoder->rav1eContextRaw = nullptr;
++  }
++
+   const heif_chroma chroma = heif_image_get_chroma_format(image);
+ 
+   RaChromaSampling chromaSampling;
+diff --git a/libheif/plugins/encoder_svt.cc b/libheif/plugins/encoder_svt.cc
+index 03d87ca1ae..521b50e614 100644
+--- a/libheif/plugins/encoder_svt.cc
++++ b/libheif/plugins/encoder_svt.cc
+@@ -699,6 +699,14 @@ static heif_error svt_start_sequence_encoding_intern(void* encoder_raw, const he
+   EbErrorType res = EB_ErrorNone;
+   heif_error err;
+ 
++  // deinit the encoder if it was already initialized
++  // (e.g. when the encoder is reused for alpha encoding after being used for YUV encoding)
++  if (encoder->svt_encoder) {
++    svt_av1_enc_deinit(encoder->svt_encoder);
++    svt_av1_enc_deinit_handle(encoder->svt_encoder);
++    encoder->svt_encoder = nullptr;
++  }
++
+   // encoder->compressed_data.clear();
+ 
+   int w = heif_image_get_width(image, heif_channel_Y);
+diff --git a/libheif/plugins/encoder_uvg266.cc b/libheif/plugins/encoder_uvg266.cc
+index 90ff2d2eb1..681e905ad5 100644
+--- a/libheif/plugins/encoder_uvg266.cc
++++ b/libheif/plugins/encoder_uvg266.cc
+@@ -465,6 +465,19 @@ static heif_error uvg266_start_sequence_encoding_intern(void* encoder_raw, const
+ {
+   encoder_struct_uvg266* encoder = (encoder_struct_uvg266*) encoder_raw;
+ 
++  // close the encoder if it was already initialized
++  // (e.g. when the encoder is reused for alpha encoding after being used for YUV encoding)
++  if (encoder->api) {
++    if (encoder->kvzencoder) {
++      encoder->api->encoder_close(encoder->kvzencoder);
++      encoder->kvzencoder = nullptr;
++    }
++    if (encoder->config) {
++      encoder->api->config_destroy(encoder->config);
++      encoder->config = nullptr;
++    }
++  }
++
+   int bit_depth = heif_image_get_bits_per_pixel_range(image, heif_channel_Y);
+ 
+   const uvg_api* api = uvg_api_get(bit_depth);
+diff --git a/libheif/plugins/encoder_vvenc.cc b/libheif/plugins/encoder_vvenc.cc
+index 5f10940402..f61d8c8711 100644
+--- a/libheif/plugins/encoder_vvenc.cc
++++ b/libheif/plugins/encoder_vvenc.cc
+@@ -434,6 +434,13 @@ static heif_error vvenc_start_sequence_encoding_intern(void* encoder_raw, const
+ {
+   encoder_struct_vvenc* encoder = (encoder_struct_vvenc*) encoder_raw;
+ 
++  // close the encoder if it was already initialized
++  // (e.g. when the encoder is reused for alpha encoding after being used for YUV encoding)
++  if (encoder->vvencoder) {
++    vvenc_encoder_close(encoder->vvencoder);
++    encoder->vvencoder = nullptr;
++  }
++
+   vvenc_config params;
+ 
+   int bit_depth = heif_image_get_bits_per_pixel_range(image, heif_channel_Y);

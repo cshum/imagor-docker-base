@@ -95,6 +95,13 @@ cmake_install highway \
   -DHWY_ENABLE_TESTS=FALSE \
   -DHWY_ENABLE_CONTRIB=FALSE
 
+cd "$deps_dir/quantizr"
+cargo cinstall \
+  --release \
+  --library-type=cdylib \
+  --prefix="$prefix" \
+  --libdir="$prefix/lib"
+
 configure_make_install expat \
   --enable-shared \
   --disable-static \
@@ -237,6 +244,11 @@ cmake_install aom \
   -DCONFIG_WEBM_IO=0
 
 cd "$deps_dir/libheif"
+# Ignore alpha in yuv2rgb and rgb2rgb if it has different BPP.
+git apply "$script_dir/patches/libheif-ignore-invalid-alpha.patch"
+# Fix memory leak in encoders.
+# Remove when the fix is released.
+git apply "$script_dir/patches/libheif-encoder-reuse-memory-leak.patch"
 mkdir -p _build
 cd _build
 cmake \

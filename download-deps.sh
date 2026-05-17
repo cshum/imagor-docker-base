@@ -55,6 +55,7 @@ fetch_tar pcre2 "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-$
 fetch_tar meson "https://github.com/mesonbuild/meson/releases/download/${MESON_VERSION}/meson-${MESON_VERSION}.tar.gz" -xz
 fetch_tar glib "https://download.gnome.org/sources/glib/$(minor_version "$GLIB_VERSION")/glib-${GLIB_VERSION}.tar.xz" -xJ
 fetch_tar highway "https://github.com/google/highway/archive/refs/tags/${HIGHWAY_VERSION}.tar.gz" -xz
+fetch_tar quantizr "https://github.com/DarthSim/quantizr/archive/v${QUANTIZR_VERSION}.tar.gz" -xz
 fetch_tar expat "https://github.com/libexpat/libexpat/releases/download/R_$(snake_version "$LIBEXPAT_VERSION")/expat-${LIBEXPAT_VERSION}.tar.gz" -xz
 fetch_tar libxml2 "https://download.gnome.org/sources/libxml2/$(minor_version "$LIBXML2_VERSION")/libxml2-${LIBXML2_VERSION}.tar.xz" -xJ
 fetch_tar libexif "https://github.com/libexif/libexif/archive/libexif-$(snake_version "$LIBEXIF_VERSION")-release.tar.gz" -xz
