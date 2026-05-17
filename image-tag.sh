@@ -11,11 +11,20 @@ case "${1:-default}" in
   default)
     echo "$base_tag"
     ;;
+  default-dev)
+    echo "${base_tag}-dev"
+    ;;
   magick)
     echo "${base_tag}-magick"
     ;;
+  magick-dev)
+    echo "${base_tag}-magick-dev"
+    ;;
   mozjpeg)
     echo "${base_tag}-mozjpeg"
+    ;;
+  mozjpeg-dev)
+    echo "${base_tag}-mozjpeg-dev"
     ;;
   ffmpeg)
     echo "${base_tag}-ffmpeg"

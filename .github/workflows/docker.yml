@@ -24,10 +24,28 @@ jobs:
       matrix:
         variant:
           - name: default
+            target: final
+            latest_tag: latest
+            build_args: ""
+          - name: default-dev
+            target: dev
+            latest_tag: latest-dev
             build_args: ""
           - name: magick
+            target: final
+            latest_tag: latest-magick
+            build_args: ENABLE_MAGICK=true
+          - name: magick-dev
+            target: dev
+            latest_tag: latest-magick-dev
             build_args: ENABLE_MAGICK=true
           - name: mozjpeg
+            target: final
+            latest_tag: latest-mozjpeg
+            build_args: ENABLE_MOZJPEG=true
+          - name: mozjpeg-dev
+            target: dev
+            latest_tag: latest-mozjpeg-dev
             build_args: ENABLE_MOZJPEG=true
 
     steps:
@@ -94,8 +112,7 @@ jobs:
           images: ghcr.io/cshum/imagor-base
           tags: |
             type=raw,value=${{ steps.versions.outputs.image_tag }}
-            type=raw,value=latest-${{ matrix.variant.name }},enable=${{ github.ref == 'refs/heads/main' && matrix.variant.name != 'default' }}
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.variant.name == 'default' }}
+            type=raw,value=${{ matrix.variant.latest_tag }},enable=${{ github.ref == 'refs/heads/main' }}
 
       - name: Build and push imagor base
         if: steps.image.outputs.exists != 'true'
@@ -103,6 +120,7 @@ jobs:
         with:
           context: .
           file: Dockerfile
+          target: ${{ matrix.variant.target }}
           platforms: linux/amd64,linux/arm64
           push: true
           build-args: ${{ matrix.variant.build_args }}
