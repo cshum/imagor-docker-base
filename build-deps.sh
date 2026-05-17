@@ -7,6 +7,11 @@ source "$script_dir/versions.sh"
 
 deps_dir=/root/deps
 prefix=/opt/imagor
+meson_cmd=(meson)
+
+if [ -f "$deps_dir/meson/meson.py" ]; then
+  meson_cmd=(python3 "$deps_dir/meson/meson.py")
+fi
 
 mkdir -p "$prefix"
 
@@ -23,7 +28,7 @@ meson_install() {
   local src="$1"
   shift
   cd "$deps_dir/$src"
-  meson setup _build \
+  "${meson_cmd[@]}" setup _build \
     --buildtype=release \
     --strip \
     --wrap-mode=nofallback \
