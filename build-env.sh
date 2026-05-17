@@ -16,7 +16,7 @@ case "$(uname -m)" in
 esac
 
 cat <<EOF
-export PATH="/opt/imagor/bin:/root/.cargo/bin:/root/.python/bin:\$PATH"
+export PATH="/opt/imagor/bin:/root/.cargo/bin:\$PATH"
 export PKG_CONFIG_LIBDIR=/opt/imagor/lib/pkgconfig
 export PKG_CONFIG_PATH=/opt/imagor/lib/pkgconfig
 export CGO_CFLAGS="-I/opt/imagor/include"

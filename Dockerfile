@@ -16,6 +16,7 @@ RUN apt-get update \
     bison \
     build-essential \
     ca-certificates \
+    cmake \
     curl \
     gettext \
     git \
@@ -32,18 +33,17 @@ RUN apt-get update \
     libcurl4-openssl-dev \
     libssl-dev \
     libtool \
+    meson \
     nasm \
+    ninja-build \
     pkg-config \
     python3 \
-    python3-pip \
-    python3-venv \
+    python3-packaging \
     xz-utils \
   && if [ "$ENABLE_MAGICK" = "true" ]; then \
     apt-get install -y --no-install-recommends libmagickwand-dev; \
   fi \
   && /tmp/imagor-base/install-rust.sh \
-  && python3 -m venv /root/.python \
-  && /root/.python/bin/pip install --no-cache-dir meson ninja packaging 'cmake<4' \
   && /tmp/imagor-base/build-env.sh > /etc/profile.d/imagor-base.sh \
   && chmod +x /tmp/imagor-base/*.sh \
   && apt-get clean \
