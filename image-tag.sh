@@ -29,8 +29,14 @@ case "${1:-default}" in
   ffmpeg)
     echo "${base_tag}-ffmpeg"
     ;;
+  ffmpeg-dev)
+    echo "${base_tag}-ffmpeg-dev"
+    ;;
   magick-ffmpeg)
     echo "${base_tag}-magick-ffmpeg"
+    ;;
+  magick-ffmpeg-dev)
+    echo "${base_tag}-magick-ffmpeg-dev"
     ;;
   *)
     echo "unknown variant: ${1}" >&2
