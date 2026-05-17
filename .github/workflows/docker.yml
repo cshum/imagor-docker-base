@@ -24,28 +24,13 @@ jobs:
       matrix:
         variant:
           - name: default
-            target: final
             latest_tag: latest
             build_args: ""
-          - name: default-dev
-            target: dev
-            latest_tag: latest-dev
-            build_args: ""
           - name: magick
-            target: final
             latest_tag: latest-magick
             build_args: ENABLE_MAGICK=true
-          - name: magick-dev
-            target: dev
-            latest_tag: latest-magick-dev
-            build_args: ENABLE_MAGICK=true
           - name: mozjpeg
-            target: final
             latest_tag: latest-mozjpeg
-            build_args: ENABLE_MOZJPEG=true
-          - name: mozjpeg-dev
-            target: dev
-            latest_tag: latest-mozjpeg-dev
             build_args: ENABLE_MOZJPEG=true
 
     steps:
@@ -120,10 +105,111 @@ jobs:
         with:
           context: .
           file: Dockerfile
-          target: ${{ matrix.variant.target }}
+          target: final
           platforms: linux/amd64,linux/arm64
           push: true
           build-args: ${{ matrix.variant.build_args }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-dev:
+    name: Publish imagor base (${{ matrix.variant.name }})
+    runs-on: ubuntu-latest
+    needs: build-base
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+        variant:
+          - name: default-dev
+            source_variant: default
+            latest_tag: latest-dev
+          - name: magick-dev
+            source_variant: magick
+            latest_tag: latest-magick-dev
+          - name: mozjpeg-dev
+            source_variant: mozjpeg
+            latest_tag: latest-mozjpeg-dev
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Read image tags
+        id: versions
+        run: |
+          chmod +x image-tag.sh
+          echo "image_tag=$(./image-tag.sh ${{ matrix.variant.name }})" >> "$GITHUB_OUTPUT"
+          echo "source_tag=$(./image-tag.sh ${{ matrix.variant.source_variant }})" >> "$GITHUB_OUTPUT"
+
+      - name: Check whether image tag is already complete
+        id: image
+        env:
+          IMAGE_REF: ghcr.io/cshum/imagor-base:${{ steps.versions.outputs.image_tag }}
+          FORCE_BUILD: ${{ github.event_name == 'workflow_dispatch' && inputs.force_build || false }}
+        run: |
+          if [ "$FORCE_BUILD" = "true" ]; then
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "reason=forced rebuild" >> "$GITHUB_OUTPUT"
+          else
+            inspect_output="$(docker manifest inspect "$IMAGE_REF" 2>/dev/null || true)"
+            if [ -z "$inspect_output" ]; then
+              echo "exists=false" >> "$GITHUB_OUTPUT"
+              echo "reason=tag missing" >> "$GITHUB_OUTPUT"
+            elif python3 -c 'import json, sys; data=json.load(sys.stdin); required={("linux", "amd64"), ("linux", "arm64")}; actual={(m.get("platform", {}).get("os"), m.get("platform", {}).get("architecture")) for m in data.get("manifests", [])} or {(data.get("os"), data.get("architecture"))}; raise SystemExit(0 if required.issubset(actual) else 1)' <<<"$inspect_output"
+            then
+              echo "exists=true" >> "$GITHUB_OUTPUT"
+              echo "reason=complete multi-arch manifest already exists" >> "$GITHUB_OUTPUT"
+            else
+              echo "exists=false" >> "$GITHUB_OUTPUT"
+              echo "reason=manifest exists but is incomplete" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Skip existing image tag
+        if: steps.image.outputs.exists == 'true'
+        run: |
+          echo "Skipping build for ${{ steps.versions.outputs.image_tag }}: ${{ steps.image.outputs.reason }}"
+
+      - name: Set up QEMU
+        if: steps.image.outputs.exists != 'true'
+        uses: docker/setup-qemu-action@v4
+        with:
+          platforms: arm64
+
+      - name: Set up Docker Buildx
+        if: steps.image.outputs.exists != 'true'
+        uses: docker/setup-buildx-action@v4
+
+      - name: Extract Docker metadata
+        id: meta
+        if: steps.image.outputs.exists != 'true'
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/cshum/imagor-base
+          tags: |
+            type=raw,value=${{ steps.versions.outputs.image_tag }}
+            type=raw,value=${{ matrix.variant.latest_tag }},enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build and push imagor base
+        if: steps.image.outputs.exists != 'true'
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: Dockerfile.dev
+          platforms: linux/amd64,linux/arm64
+          push: true
+          build-args: |
+            SOURCE_TAG=${{ steps.versions.outputs.source_tag }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
