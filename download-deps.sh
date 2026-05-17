@@ -67,6 +67,7 @@ fetch_tar libwebp "https://storage.googleapis.com/downloads.webmproject.org/rele
 fetch_tar libtiff "https://gitlab.com/libtiff/libtiff/-/archive/v${LIBTIFF_VERSION}/libtiff-v${LIBTIFF_VERSION}.tar.gz" -xz
 fetch_tar cgif "https://github.com/dloebl/cgif/archive/refs/tags/v${CGIF_VERSION}.tar.gz" -xz
 fetch_tar libde265 "https://github.com/strukturag/libde265/releases/download/v${LIBDE265_VERSION}/libde265-${LIBDE265_VERSION}.tar.gz" -xz
+fetch_git x265 https://github.com/videolan/x265.git "${X265_VERSION}"
 fetch_tar kvazaar "https://github.com/ultravideo/kvazaar/archive/refs/tags/v${KVAZAAR_VERSION}.tar.gz" -xz
 fetch_tar dav1d "https://code.videolan.org/videolan/dav1d/-/archive/${DAV1D_VERSION}/dav1d-${DAV1D_VERSION}.tar.gz" -xz
 fetch_tar aom "https://storage.googleapis.com/aom-releases/libaom-${AOM_VERSION}.tar.gz" -xz

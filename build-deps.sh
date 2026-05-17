@@ -203,6 +203,19 @@ cmake \
   ..
 ninja install/strip
 
+cd "$deps_dir/x265"
+mkdir -p build/linux
+cd build/linux
+cmake \
+  -G Ninja \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX="$prefix" \
+  -DENABLE_SHARED=TRUE \
+  -DENABLE_CLI=FALSE \
+  -DENABLE_LIBNUMA=FALSE \
+  ../../source
+ninja install/strip
+
 cd "$deps_dir/kvazaar"
 ./autogen.sh
 ./configure \
@@ -233,6 +246,7 @@ cmake \
   --preset=release-noplugins \
   -DBUILD_SHARED_LIBS=1 \
   -DWITH_EXAMPLES=0 \
+  -DWITH_X265=1 \
   -DWITH_KVAZAAR=1 \
   -DWITH_DAV1D=1 \
   -DWITH_DAV1D_PLUGIN=0 \
