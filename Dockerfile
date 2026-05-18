@@ -59,6 +59,8 @@ RUN /tmp/imagor-base/download-deps.sh \
 
 FROM ${BASE_IMAGE} AS final
 
+ARG ENABLE_MAGICK=false
+
 RUN apt-get update \
   && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     bash \
